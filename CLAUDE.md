@@ -2,7 +2,7 @@
 
 - Follow `north_stars.md` for repo-wide engineering constraints.
 - Follow `llm_rules.md` for any LLM usage. Allowed model names live in `allowed_models.csv`.
-- The design spec is in `docs/spec.md`.
+- Design spec & notes are in `harness_engineering/` (`claude/`, `codex/`).
 
 ## Environment
 

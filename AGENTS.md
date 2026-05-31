@@ -5,7 +5,7 @@
 - Follow `north_stars.md` for coding constraints (simplicity, single responsibility,
   absolute imports `api_recon_harness.*`, no pytest, conda-only, deterministic control plane).
 - Follow `llm_rules.md` for any LLM calls. Allowed model names live in `allowed_models.csv`.
-- Spec & design notes are in `docs/`.
+- Spec & design notes are in `harness_engineering/`.
 - **API key handling:** `.env` holds the LLM key (`OPENAI_API_KEY`, or another provider) and,
   for a header-authed target, that endpoint's key under the env-var name the request names.
   Always load via `python-dotenv`; never echo to stdout; never commit. Public no-auth

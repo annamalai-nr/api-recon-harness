@@ -191,7 +191,7 @@ severity classification, cross-parameter consolidation, and policy mapping.
 
 Built as an engineering exercise around a black-box GET-API recon workflow, then
 generalized into this standalone tool. The original design spec and notes are
-archived under [`docs/`](docs/). Conventions live in
+archived under [`harness_engineering/`](harness_engineering/). Conventions live in
 [`north_stars.md`](north_stars.md) and [`llm_rules.md`](llm_rules.md).
 
 No license has been chosen yet — all rights reserved by default. Open an issue if
