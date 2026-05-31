@@ -1,9 +1,19 @@
-# API-recon harness — runtime dependencies (pip install -e . preferred)
+# API-recon harness — dependencies (prefer `pip install -e .`)
+
+# Core runtime
 python-dotenv
 httpx
 pyyaml
 pydantic
+
+# LLM (text models via the LiteLLM Python SDK; openai for the default provider)
 litellm
 openai
+
+# Web app (FastAPI front door + server)
 fastapi
 uvicorn
+
+# Dev
+black
+flake8

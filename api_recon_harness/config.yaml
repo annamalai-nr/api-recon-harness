@@ -1,6 +1,6 @@
 # API-recon harness — LLM config (model selection stays config-driven, per
-# north_stars LLM-2). Model must be a text model from
-# backend/reference_docs/allowed_models.csv.
+# north_stars LLM-2). Model must be a text model from allowed_models.csv
+# (project root). See llm_rules.md for token/temperature/reasoning rules.
 
 llm:
   model_name: "gpt-5.5"

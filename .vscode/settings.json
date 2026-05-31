@@ -1,0 +1,56 @@
+{
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "git.ignoreLimitWarning": true,
+    "python.analysis.extraPaths": ["${workspaceFolder}"],
+    "python.analysis.autoSearchPaths": true,
+
+    // ── Disable ALL Python diagnostics (Pylance / Pyright) ──
+    "python.linting.enabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": false,
+    "python.linting.mypyEnabled": false,
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.ignore": ["**"],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none",
+        "reportMissingModuleSource": "none",
+        "reportGeneralTypeIssues": "none",
+        "reportPrivateImportUsage": "none",
+        "reportUnusedImport": "none",
+        "reportUnusedVariable": "none",
+        "reportUndefinedVariable": "none",
+        "reportAttributeAccessIssue": "none"
+    },
+
+    // ── Disable Cursor's built-in Pyright (cursorpyright) ──
+    "cursorpyright.analysis.autoSearchPaths": true,
+    "cursorpyright.analysis.extraPaths": ["${workspaceFolder}"],
+    "cursorpyright.analysis.typeCheckingMode": "off",
+    "cursorpyright.analysis.ignore": ["**"],
+
+    // ── Disable other linters ──
+    "pylint.enabled": false,
+    "flake8.enabled": false,
+    "ruff.enable": false,
+    "mypy-type-checker.enabled": false,
+
+    // ── Editor ──
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.git": true,
+        "**/.DS_Store": true
+    },
+    "search.exclude": {
+        "**/__pycache__": true,
+        "**/outputs": true
+    }
+}
