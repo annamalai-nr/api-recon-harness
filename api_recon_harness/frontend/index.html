@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!--
+  API-recon harness — single-page app (Input → Progress → Results).
+
+  Talks to the FastAPI front door (server.py): POST /runs to start, GET /runs/{id}
+  to poll phase/status, GET /runs/{id}/report for the rendered report, POST /draft
+  to auto-fill parameters from a docs URL. The deterministic core is untouched;
+  this page is just inputs, live progress, and inspection. Vanilla JS, no build.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API-recon Harness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBFAF6; --panel:#FFFFFF; --ink:#1C1B18; --ink-soft:#5C574E;
+  --rule:#E8E2D5; --rule-strong:#D7CFBE;
+  --major:#A31B12; --major-soft:#FBEDEA; --major-line:#E7BDB6;
+  --minor:#4F5A6B; --minor-soft:#EEF1F5; --minor-line:#CBD4E0;
+  --accent:#1F6F5C; --accent-soft:#E7F1ED; --accent-line:#BFDFD5;
+  --reject:#9A3528; --reject-soft:#FBEAE6;
+  --amber:#8A5A00; --amber-soft:#FBF1D6;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --display:'Fraunces','Iowan Old Style',Georgia,serif;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:var(--sans);line-height:1.55;
+  background-image:radial-gradient(120% 60% at 100% 0%,#FFFDF8 0%,rgba(255,253,248,0) 60%),
+    repeating-linear-gradient(0deg,rgba(28,27,24,.02) 0 1px,transparent 1px 30px);}
+.wrap{max-width:1180px;margin:0 auto;padding:1.8rem clamp(1rem,3vw,2rem) 4rem}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-soft);display:flex;align-items:center;gap:.6rem;margin:0 0 .4rem}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--rule-strong)}
+.masthead{border-bottom:2px solid var(--ink);padding-bottom:1.1rem;margin-bottom:1.6rem}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(1.8rem,4.5vw,2.7rem);margin:.2rem 0 0;letter-spacing:-.015em}
+h2{font-family:var(--display);font-weight:600;font-size:1.3rem;margin:1.6rem 0 .7rem}
+label{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 .25rem}
+input[type=text],input[type=number],textarea{width:100%;font-family:var(--sans);font-size:.92rem;
+  padding:.55rem .65rem;border:1px solid var(--rule-strong);border-radius:8px;background:var(--panel);color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--ink)}
+.field{margin-bottom:.9rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:1.1rem 1.2rem;
+  box-shadow:0 14px 30px -28px rgba(28,27,24,.55);margin-bottom:1.1rem}
+.param{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;border:1px solid var(--rule);border-radius:10px;
+  padding:.8rem;margin:.6rem 0;position:relative}
+.param .full{grid-column:1/3}
+.param .del{position:absolute;top:.5rem;right:.6rem}
+.btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  background:var(--ink);color:var(--paper);border:1px solid var(--ink);padding:.6rem 1rem;border-radius:8px;transition:.15s}
+.btn:hover{opacity:.86}
+.btn.ghost{background:var(--panel);color:var(--ink-soft);border-color:var(--rule-strong)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--ink);opacity:1}
+.btn.sm{padding:.35rem .6rem;font-size:.66rem}
+.check{display:flex;align-items:center;gap:.5rem;font-family:var(--sans);font-size:.9rem;text-transform:none;letter-spacing:0;color:var(--ink)}
+.check input{width:auto}
+.hint{font-size:.78rem;color:var(--ink-soft);margin-top:.2rem}
+.actions{display:flex;gap:.7rem;align-items:center;margin-top:.6rem;flex-wrap:wrap}
+details.adv{margin:.4rem 0 1rem}details.adv summary{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-soft);cursor:pointer}
+.verdict{border-radius:10px;padding:.7rem .9rem;margin:.8rem 0;font-size:.9rem}
+.verdict.bad{background:var(--reject-soft);border:1px solid var(--major-line);color:var(--reject)}
+.verdict.good{background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent)}
+/* progress */
+.progress{text-align:center;padding:3rem 1rem}
+.spinner{width:46px;height:46px;border:3px solid var(--rule-strong);border-top-color:var(--ink);
+  border-radius:50%;margin:0 auto 1.4rem;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phase{font-family:var(--mono);font-size:1rem;color:var(--ink)}
+.elapsed{font-family:var(--mono);font-size:.8rem;color:var(--ink-soft);margin-top:.4rem}
+/* results */
+.hero{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:1.1rem 1.3rem;
+  box-shadow:0 16px 34px -30px rgba(28,27,24,.6);display:flex;flex-wrap:wrap;gap:1.4rem 2rem;align-items:center;margin-bottom:1.2rem}
+.state{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:.34rem .7rem;border-radius:999px}
+.state.complete{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line)}
+.state.needs_revision{background:var(--amber-soft);color:var(--amber);border:1px solid #E6CF93}
+.state.error,.state.running{background:var(--reject-soft);color:var(--reject);border:1px solid var(--major-line)}
+.runid{font-family:var(--mono);font-size:.78rem;color:var(--ink-soft)}
+.stat{display:flex;flex-direction:column}.stat .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.stat .v{font-family:var(--display);font-size:1.3rem;font-weight:600}
+.detail{flex-basis:100%;font-family:var(--mono);font-size:.74rem;color:var(--ink-soft)}
+.grid{display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:1.2rem;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.row,.param{grid-template-columns:1fr}}
+.finding{background:var(--panel);border:1px solid var(--rule);border-radius:11px;margin:.7rem 0;padding:.85rem 1rem}
+.finding.sev-Major{border-left:3px solid var(--major)}.finding.sev-Minor{border-left:3px solid var(--minor)}
+.finding.approved{background:var(--accent-soft)}.finding.rejected{opacity:.6}
+.frow{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.4rem}
+.fid{font-family:var(--mono);font-size:.7rem;font-weight:600;background:var(--ink);color:var(--paper);padding:.16rem .45rem;border-radius:5px}
+.ftitle{font-family:var(--display);font-weight:500;font-size:1.02rem;flex:1}
+.sevtag{font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .45rem;border-radius:999px}
+.sevtag.Major{background:var(--major-soft);color:var(--major);border:1px solid var(--major-line)}
+.sevtag.Minor{background:var(--minor-soft);color:var(--minor);border:1px solid var(--minor-line)}
+.seg{display:inline-flex;border:1px solid var(--rule-strong);border-radius:8px;overflow:hidden;margin-top:.3rem}
+.seg button{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;background:var(--panel);border:none;border-right:1px solid var(--rule-strong);padding:.35rem .65rem;cursor:pointer;color:var(--ink-soft)}
+.seg button:last-child{border-right:none}.seg button.on-approve{background:var(--accent);color:#fff}.seg button.on-reject{background:var(--reject);color:#fff}
+.decision{font-family:var(--mono);font-size:.66rem;color:var(--ink-soft);margin-left:.6rem}
+.reportpanel{background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:0 16px 34px -30px rgba(28,27,24,.6)}
+.reportpanel .bar{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);padding:.6rem 1rem;border-bottom:1px solid var(--rule);background:var(--paper)}
+iframe{width:100%;height:74vh;border:none;display:block;background:#fff}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <p class="eyebrow">API Reconnaissance · Harness</p>
+    <h1>Probe an endpoint</h1>
+  </div>
+
+  <!-- ───────────── INPUT ───────────── -->
+  <section id="view-input">
+    <div class="card">
+      <div class="field"><label>Endpoint URL (GET)</label>
+        <input type="text" id="endpoint_url" placeholder="https://api.open-meteo.com/v1/forecast"></div>
+      <div class="field"><label>Downstream context (drives policies)</label>
+        <input type="text" id="downstream" placeholder="a backend weather service serving other applications"></div>
+      <details class="adv"><summary>Auth &amp; options</summary>
+        <div class="row" style="margin-top:.7rem">
+          <div class="field"><label>Auth header name</label><input type="text" id="auth_header" value="X-API-Key"></div>
+          <div class="field"><label>Auth env var</label><input type="text" id="auth_env" value="DUMMY_API_KEY">
+            <div class="hint">Server reads the key from its env / .env. Use <code>DUMMY_API_KEY</code> for public no-auth APIs, <code>ELYOS_API_KEY</code> for Elyos. Never typed here.</div></div>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="run_preflight" checked> Preflight (one valid call/param)</label>
+          <label class="check"><input type="checkbox" id="run_auth_edges"> Auth-edge probes</label>
+        </div>
+        <div class="field" style="margin-top:.7rem"><label>Max calls (optional budget ceiling)</label>
+          <input type="number" id="max_calls" placeholder="e.g. 60"></div>
+      </details>
+    </div>
+
+    <h2>Parameters</h2>
+    <div class="card">
+      <div class="field"><label>Docs URL (optional — let the agent draft parameters)</label>
+        <div class="actions"><input type="text" id="docs_url" placeholder="https://www.datamuse.com/api/" style="flex:1">
+          <button class="btn ghost" id="draftBtn">Draft from docs</button></div>
+        <div class="hint">Drafts a candidate parameter set from the docs; the deterministic gate still owns the verdict.</div>
+      </div>
+      <div id="params"></div>
+      <div class="actions">
+        <button class="btn ghost sm" id="addParam">+ Add parameter</button>
+        <label class="check" id="indepWrap" style="display:none"><input type="checkbox" id="independence" checked> Parameters are independent</label>
+      </div>
+    </div>
+
+    <div id="inputVerdict"></div>
+    <div class="actions"><button class="btn" id="runBtn">Run reconnaissance</button></div>
+  </section>
+
+  <!-- ───────────── PROGRESS ───────────── -->
+  <section id="view-progress" class="hidden">
+    <div class="card progress">
+      <div class="spinner"></div>
+      <div class="state running" id="prState">running</div>
+      <p class="phase" id="prPhase">queued…</p>
+      <p class="elapsed" id="prElapsed">0.0s · <span id="prRun"></span></p>
+    </div>
+  </section>
+
+  <!-- ───────────── RESULTS ───────────── -->
+  <section id="view-results" class="hidden">
+    <div class="hero" id="hero"></div>
+    <div class="actions" style="margin-bottom:1rem"><button class="btn ghost" id="newRun">← New run</button></div>
+    <div class="grid">
+      <section><h2 style="margin-top:0">Findings <small id="reviewcount" class="runid"></small></h2><div id="findings"></div></section>
+      <section class="reportpanel"><div class="bar">report.html</div><iframe id="report" title="report"></iframe></section>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let RUN_ID = null, POLL = null;
+
+function show(view){ for(const v of ["input","progress","results"]) $("view-"+v).classList.toggle("hidden", v!==view); }
+
+// ── Parameters repeater ──
+function paramRow(p={}){
+  const d = document.createElement("div"); d.className = "param";
+  d.innerHTML =
+    `<input type="text" class="pname" placeholder="name (e.g. latitude)" value="${p.name||""}">
+     <input type="text" class="ppurpose" placeholder="purpose" value="${p.purpose||""}">
+     <input type="text" class="ptier1 full" placeholder="tier-1 values, comma-separated (6–10)" value="${(p.tier1_values||[]).join(', ')}">
+     <input type="text" class="pcomp full" placeholder="pinned companions: name=value, name=value (optional)" value="${(p.pinned_companions||[]).map(c=>c.name+'='+c.value).join(', ')}">
+     <button class="btn ghost sm del">remove</button>`;
+  d.querySelector(".del").onclick = () => { d.remove(); refreshIndep(); };
+  return d;
+}
+function addParam(p){ $("params").append(paramRow(p)); refreshIndep(); }
+function refreshIndep(){ $("indepWrap").style.display = $("params").children.length>1 ? "flex" : "none"; }
+$("addParam").onclick = () => addParam();
+
+function parseComps(s){
+  return s.split(",").map(x=>x.trim()).filter(Boolean).map(pair=>{
+    const i = pair.indexOf("="); return {name: pair.slice(0,i).trim(), value: pair.slice(i+1).trim()};
+  }).filter(c=>c.name);
+}
+function buildRequest(){
+  const params = [...$("params").children].map(d=>({
+    name: d.querySelector(".pname").value.trim(),
+    purpose: d.querySelector(".ppurpose").value.trim(),
+    tier1_values: d.querySelector(".ptier1").value.split(",").map(x=>x.trim()).filter(Boolean),
+    pinned_companions: parseComps(d.querySelector(".pcomp").value),
+  })).filter(p=>p.name);
+  const req = {
+    endpoint_url: $("endpoint_url").value.trim(),
+    auth_header_name: $("auth_header").value.trim(),
+    auth_env_var: $("auth_env").value.trim(),
+    downstream_context: $("downstream").value.trim() || null,
+    run_auth_edges: $("run_auth_edges").checked,
+    run_preflight: $("run_preflight").checked,
+    parameters: params,
+  };
+  if(params.length>1) req.parameters_independence_declared = $("independence").checked;
+  const mc = $("max_calls").value.trim(); if(mc) req.max_calls = parseInt(mc,10);
+  const du = $("docs_url").value.trim(); if(du) req.docs_url = du;
+  return req;
+}
+
+// ── Draft from docs ──
+$("draftBtn").onclick = async () => {
+  $("draftBtn").textContent = "Drafting…"; $("draftBtn").disabled = true;
+  try{
+    const r = await (await fetch("/draft",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildRequest())})).json();
+    if(r.request && r.request.parameters){
+      $("params").innerHTML = ""; r.request.parameters.forEach(addParam);
+      if(r.request.parameters_independence_declared!==undefined) $("independence").checked = r.request.parameters_independence_declared;
+    }
+    verdict(r.ok, r.ok ? "Draft passed the scope gate — review and run." : (r.rejection || (r.questions||[]).join("; ")));
+  }catch(e){ verdict(false, e.message); }
+  $("draftBtn").textContent = "Draft from docs"; $("draftBtn").disabled = false;
+};
+
+function verdict(ok, msg){ $("inputVerdict").innerHTML = msg ? `<div class="verdict ${ok?'good':'bad'}">${msg}</div>` : ""; }
+
+// ── Run ──
+$("runBtn").onclick = async () => {
+  verdict(true, "");
+  const r = await (await fetch("/runs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildRequest())})).json();
+  if(!r.ok){ verdict(false, r.rejection || (r.questions||[]).join("; ")); return; }
+  RUN_ID = r.run_id; show("progress"); $("prRun").textContent = RUN_ID;
+  POLL = setInterval(poll, 1500); poll();
+};
+
+async function poll(){
+  const d = await (await fetch("/runs/"+RUN_ID)).json();
+  $("prPhase").textContent = d.phase || "…"; $("prElapsed").firstChild.textContent = (d.elapsed_s||0)+"s · ";
+  if(d.state && d.state!=="running"){ clearInterval(POLL); showResults(d); }
+}
+
+// ── Results ──
+const decisions = () => JSON.parse(localStorage.getItem("recon_review:"+RUN_ID)||"{}");
+function setDecision(fid,v){ const x=decisions(); x[fid]=(x[fid]===v)?"":v; localStorage.setItem("recon_review:"+RUN_ID,JSON.stringify(x)); }
+
+function showResults(d){
+  show("results");
+  const s = d.status || {state:d.state, expected_calls:"–", actual_calls:"–", exit_code:"–", detail:d.error||""};
+  $("hero").innerHTML =
+    `<span class="state ${s.state}">${(s.state||"").replace("_"," ")}</span>
+     <span class="runid">${RUN_ID}</span>
+     <div class="stat"><span class="k">planned</span><span class="v">${s.expected_calls}</span></div>
+     <div class="stat"><span class="k">actual</span><span class="v">${s.actual_calls}</span></div>
+     <div class="stat"><span class="k">exit</span><span class="v">${s.exit_code}</span></div>
+     ${s.detail?`<div class="detail">${s.detail}</div>`:""}`;
+  renderFindings(d.findings||[]);
+  const rep = $("report");
+  if((d.findings||[]).length){ rep.src = "/runs/"+RUN_ID+"/report"; rep.parentElement.classList.remove("hidden"); }
+  else { rep.parentElement.classList.add("hidden"); }
+}
+function renderFindings(list){
+  const dec = decisions(); const host = $("findings"); host.innerHTML = "";
+  if(!list.length){ host.innerHTML = '<p class="runid">No findings (run did not complete, or none generated).</p>'; $("reviewcount").textContent=""; return; }
+  for(const f of list){
+    const v = dec[f.id]||""; const div = document.createElement("div");
+    div.className = "finding sev-"+f.severity+(v?" "+v:"");
+    div.innerHTML = `<div class="frow"><span class="fid">${f.id}</span><span class="ftitle">${f.title}</span><span class="sevtag ${f.severity}">${f.severity}</span></div>
+      <div class="seg"><button data-a="approved" class="${v==='approved'?'on-approve':''}">Approve</button><button data-a="rejected" class="${v==='rejected'?'on-reject':''}">Reject</button></div><span class="decision">${v||"pending"}</span>`;
+    div.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{setDecision(f.id,b.dataset.a);renderFindings(list);});
+    host.append(div);
+  }
+  const n = list.filter(f=>dec[f.id]==="approved").length;
+  $("reviewcount").textContent = `${n}/${list.length} approved`;
+}
+$("newRun").onclick = () => { RUN_ID=null; show("input"); };
+
+// seed one empty parameter row
+addParam();
+</script>
+</body>
+</html>

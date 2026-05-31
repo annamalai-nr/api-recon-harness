@@ -1,0 +1,18 @@
+{
+  "endpoint_url": "https://api.open-meteo.com/v1/forecast",
+  "auth_header_name": "X-API-Key",
+  "auth_env_var": "DUMMY_API_KEY",
+  "downstream_context": "a backend weather service serving other applications; sensitive to coordinate validation and response-shape stability",
+  "run_auth_edges": false,
+  "run_preflight": true,
+  "parameters_independence_declared": true,
+  "shared_tier3_edges": [{"label": "empty"}, {"label": "very_long"}, {"label": "unicode_cjk"}, {"label": "html_inject"}],
+  "parameters": [
+    {"name": "latitude", "purpose": "WGS84 latitude (-90 to 90)",
+     "tier1_values": ["51.5", "48.8", "35.7", "-33.9", "0", "60"],
+     "pinned_companions": [{"name": "longitude", "value": "0"}]},
+    {"name": "longitude", "purpose": "WGS84 longitude (-180 to 180)",
+     "tier1_values": ["0", "-74", "139.7", "151.2", "100", "-50"],
+     "pinned_companions": [{"name": "latitude", "value": "51.5"}]}
+  ]
+}

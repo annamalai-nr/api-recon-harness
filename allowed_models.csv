@@ -1,0 +1,22 @@
+provider,model,type,release_or_update_date,notes
+openai,gpt-5.5,text,current as of OpenAI models page,GPT-5.5 base text model
+openai,gpt-5.5-pro,text,current as of OpenAI models page,GPT-5.5 higher-capability text model
+openai,gpt-5.4,text,current as of OpenAI models page,GPT-5.4 base text model
+openai,gpt-5.4-pro,text,current as of OpenAI models page,GPT-5.4 higher-capability text model
+openai,gpt-5.4-mini,text,current as of OpenAI models page,GPT-5.4 smaller lower-latency text model
+anthropic,anthropic/claude-opus-4-7,text,current as of Anthropic models page,Claude Opus 4.7 text model
+anthropic,anthropic/claude-opus-4-6,text,current as of Anthropic models page,Claude Opus 4.6 text model
+anthropic,anthropic/claude-sonnet-4-6,text,current as of Anthropic models page,Claude Sonnet 4.6 default text model
+anthropic,anthropic/claude-haiku-4-5-20251001,text,October 2025,Claude Haiku 4.5 text model
+gemini,gemini/gemini-3.1-pro-preview,text,current as of Gemini models page,Gemini 3.1 Pro preview text model
+gemini,gemini/gemini-3.1-flash-preview,text,current as of Gemini models page,Gemini 3.1 Flash preview text model
+gemini,gemini/gemini-3.1-flash-lite-preview,text,current as of Gemini models page,Gemini 3.1 Flash Lite preview text model
+openai,gpt-realtime-1.5,realtime,current as of OpenAI models page,Best OpenAI realtime voice model
+openai,gpt-4o-transcribe,stt,current as of OpenAI models page,Best OpenAI standard STT
+openai,gpt-4o-transcribe-diarize,stt,current as of OpenAI models page,Use when speaker diarization is required
+gemini,gemini-3.1-flash-live-preview,realtime,March 2026,Latest Gemini realtime Live API model
+gemini,gemini-3.1-flash-tts-preview,tts,April 2026,Latest Gemini TTS preview model
+elevenlabs,eleven_v3,tts,June 2025,Latest expressive ElevenLabs TTS
+elevenlabs,eleven_flash_v2_5,tts,December 2024,Latest low-latency ElevenLabs TTS for agents
+elevenlabs,scribe_v2,stt,January 2026,Latest ElevenLabs batch STT
+elevenlabs,scribe_v2_realtime,stt,November 2025,Latest ElevenLabs realtime STT

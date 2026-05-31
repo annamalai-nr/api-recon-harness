@@ -1,0 +1,16 @@
+{
+  "endpoint_url": "https://elyos-interview-907656039105.europe-west2.run.app/weather",
+  "auth_header_name": "X-API-Key",
+  "auth_env_var": "ELYOS_API_KEY",
+  "downstream_context": "an interactive streaming CLI chat assistant",
+  "run_auth_edges": true,
+  "run_preflight": true,
+  "max_calls": 60,
+  "parameters": [
+    {
+      "name": "location",
+      "purpose": "City or place name to fetch current weather for",
+      "tier1_values": ["London", "Paris", "Tokyo", "Mumbai", "New York", "Sydney", "Cairo", "Reykjavik"]
+    }
+  ]
+}

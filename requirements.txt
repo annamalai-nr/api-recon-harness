@@ -1,0 +1,9 @@
+# API-recon harness — runtime dependencies (pip install -e . preferred)
+python-dotenv
+httpx
+pyyaml
+pydantic
+litellm
+openai
+fastapi
+uvicorn

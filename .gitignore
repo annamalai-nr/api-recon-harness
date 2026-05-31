@@ -1,0 +1,14 @@
+# secrets
+.env
+
+# run artifacts
+outputs/
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# os
+.DS_Store

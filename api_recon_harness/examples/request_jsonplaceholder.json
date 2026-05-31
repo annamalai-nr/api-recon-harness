@@ -1,0 +1,13 @@
+{
+  "endpoint_url": "https://jsonplaceholder.typicode.com/todos",
+  "auth_header_name": "X-API-Key",
+  "auth_env_var": "DUMMY_API_KEY",
+  "downstream_context": "an internal task-tracker UI that displays user todos; sensitive to schema stability across user IDs",
+  "run_auth_edges": false,
+  "run_preflight": true,
+  "shared_tier3_edges": [{"label": "empty"}, {"label": "very_long"}, {"label": "unicode_cjk"}, {"label": "html_inject"}],
+  "parameters": [
+    {"name": "userId", "purpose": "Returns todo items for a specific user ID (integer 1-10)",
+     "tier1_values": ["1", "2", "5", "10", "3", "7"]}
+  ]
+}

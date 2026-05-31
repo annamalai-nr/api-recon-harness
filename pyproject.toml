@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "api-recon-harness"
+version = "0.1.0"
+description = "Deterministic harness for black-box GET-API reconnaissance — bounded LLM, verifiable reports"
+authors = [{name = "Annamalai Narayanan"}]
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv",
+    "httpx",
+    "pyyaml",
+    "pydantic",
+    "litellm",
+    "openai",
+    "fastapi",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+]
+
+[project.scripts]
+# Distinct entry points: headless CLI vs. the browser-driven web app.
+api-recon = "api_recon_harness.interfaces.cli:main"
+api-recon-web = "api_recon_harness.interfaces.server:main"
+
+[tool.hatch.build]
+packages = ["api_recon_harness"]
+include = [
+    "api_recon_harness/**/*.py",
+    "api_recon_harness/*.yaml",
+    "api_recon_harness/frontend/*.html",
+    "api_recon_harness/examples/*.json",
+]
