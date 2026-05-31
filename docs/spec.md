@@ -1,5 +1,15 @@
 # Spec — API-Recon Harness (Python + TypeScript)
 
+> **Provenance note.** This is the original design spec, imported verbatim from the
+> `elyosai` repo where the harness was first built. Internal path references (e.g.
+> `north_stars.md`, `AGENTS.md`, `backend/api_recon/api_recon_report.md`,
+> `smart_research/.../langgraph_examples/`) point at that original repo layout, not
+> this standalone project. In this project the implementation lives under
+> `api_recon_harness/`, conventions in `north_stars.md` / `llm_rules.md`, and the
+> built artifacts may differ from the spec where the README documents a deviation
+> (e.g. the docs→config agent is a bounded completion rather than LangGraph
+> `create_agent`). Kept unedited as an archived reference.
+
 **Status:** Draft v1 · **Scope:** single GET endpoint, header/API-key auth · **Target:** a thin deterministic harness around the existing `get-api-recon-v3.1` skill.
 
 ## 1. Purpose & intent
