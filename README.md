@@ -112,8 +112,13 @@ the intake gate before any network call.
 
 ## Layout
 
+Backend and frontend are separate top-level folders: the `api_recon_harness/`
+Python package is the backend; `frontend/` holds the single-page web UI. The
+server reads `frontend/index.html` from disk (a project-root resource, like
+`outputs/` and `.env`), so the package stays pure Python.
+
 ```
-api_recon_harness/
+api_recon_harness/       BACKEND — Python package (no UI inside)
   models.py            all Pydantic data models (request, evidence, findings, LLM envelopes, status)
   paths.py             filesystem constants — single source of truth (PROJECT_ROOT, KERNEL_DIR, RUNS_DIR…)
   config.yaml          model selection (config-driven)
@@ -131,15 +136,18 @@ api_recon_harness/
   validators.py        parity + secret + evidence-ref + policy-map review gate
   run.py               orchestrator (intake → plan → budget → execute → analyze → LLM → render → verify)
   interfaces/cli.py    headless CLI entry
-  interfaces/server.py FastAPI front door + SPA
-  frontend/index.html  single-page app: Input → Progress → Results (per-finding approve/reject)
+  interfaces/server.py FastAPI front door (serves the frontend + the JSON API)
   kernel/              GET probe runner + parity verifier — reused verbatim, never edited
   evals/run_evals.py   live fixture-based LLM-step evals (--evals)
   tests/run_tests.py   12 offline self-tests (--validate)
+
+frontend/                FRONTEND — web UI (no Python)
+  index.html           single-page app: Input → Progress → Results (per-finding approve/reject)
 ```
 
 Conventional layout: data models in `models.py`, prompts in `prompts/`, UI
-interfaces in `interfaces/`, the JS web UI in `frontend/`. `report.html` and the
+interfaces (the FastAPI server + CLI) in `interfaces/`, the JS web UI in the
+top-level `frontend/`. `report.html` and the
 SPA share a light-mode "forensic dossier" design (Fraunces + IBM Plex; crimson =
 Major, slate = Minor); the report's CSS is emitted by `render.py`, so it's genuine
 harness output and still passes the parity verifier.

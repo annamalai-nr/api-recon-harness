@@ -30,11 +30,19 @@ dev = [
 api-recon = "api_recon_harness.interfaces.cli:main"
 api-recon-web = "api_recon_harness.interfaces.server:main"
 
+# Backend = the `api_recon_harness` package. Frontend = the top-level `frontend/`
+# directory (a PROJECT_ROOT-relative resource, not package data); force-include
+# keeps it in built artifacts so the server can still find frontend/index.html.
 [tool.hatch.build]
 packages = ["api_recon_harness"]
 include = [
     "api_recon_harness/**/*.py",
     "api_recon_harness/*.yaml",
-    "api_recon_harness/frontend/*.html",
     "api_recon_harness/examples/*.json",
 ]
+
+[tool.hatch.build.targets.wheel.force-include]
+"frontend/index.html" = "frontend/index.html"
+
+[tool.hatch.build.targets.sdist.force-include]
+"frontend/index.html" = "frontend/index.html"
