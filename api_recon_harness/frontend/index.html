@@ -124,7 +124,7 @@ iframe{width:100%;height:74vh;border:none;display:block;background:#fff}
         <div class="row" style="margin-top:.7rem">
           <div class="field"><label>Auth header name</label><input type="text" id="auth_header" value="X-API-Key"></div>
           <div class="field"><label>Auth env var</label><input type="text" id="auth_env" value="DUMMY_API_KEY">
-            <div class="hint">Server reads the key from its env / .env. Use <code>DUMMY_API_KEY</code> for public no-auth APIs, <code>ELYOS_API_KEY</code> for Elyos. Never typed here.</div></div>
+            <div class="hint">Server reads the key from its env / .env. Use <code>DUMMY_API_KEY</code> for public no-auth APIs, or your provider's key env-var name for a header-authed endpoint. Never typed here.</div></div>
         </div>
         <div class="row">
           <label class="check"><input type="checkbox" id="run_preflight" checked> Preflight (one valid call/param)</label>

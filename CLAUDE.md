@@ -2,12 +2,11 @@
 
 - Follow `north_stars.md` for repo-wide engineering constraints.
 - Follow `llm_rules.md` for any LLM usage. Allowed model names live in `allowed_models.csv`.
-- Spec & design notes are in `docs/` (`spec.md`, the two `*_note.md`).
+- The design spec is in `docs/spec.md`.
 
 ## Environment
 
-- **Conda env:** `elyosai` (Python 3.12) — shared with the sibling repo, or create a
-  dedicated env. Install with `pip install -e .` (Hatch).
+- **Env:** Python 3.11+ (developed on 3.12); conda or venv. Install with `pip install -e .` (Hatch).
 - **Two entry points:**
   - CLI (headless): `python -m api_recon_harness` (console script `api-recon`)
   - Web app: `python -m api_recon_harness.interfaces.server` (console script `api-recon-web`)

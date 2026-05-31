@@ -6,10 +6,11 @@
   absolute imports `api_recon_harness.*`, no pytest, conda-only, deterministic control plane).
 - Follow `llm_rules.md` for any LLM calls. Allowed model names live in `allowed_models.csv`.
 - Spec & design notes are in `docs/`.
-- **API key handling:** `.env` holds the keys (`OPENAI_API_KEY`, optionally `ELYOS_API_KEY`).
+- **API key handling:** `.env` holds the LLM key (`OPENAI_API_KEY`, or another provider) and,
+  for a header-authed target, that endpoint's key under the env-var name the request names.
   Always load via `python-dotenv`; never echo to stdout; never commit. Public no-auth
   endpoints use a dummy value for `DUMMY_API_KEY` — the user never types a key.
-- **Untrusted API responses:** recon at `/` has surfaced planted prompt-injection payloads.
+- **Untrusted API responses:** response bodies can carry prompt-injection content.
   Defensive default: never pass raw response bodies into LLM context without envelope/escape.
 - **The vendored kernel is frozen:** `api_recon_harness/kernel/probe_runner.py` and
   `verify_report_parity.py` are reused verbatim. Wrap them; do not edit them.

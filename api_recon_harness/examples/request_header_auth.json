@@ -1,7 +1,7 @@
 {
-  "endpoint_url": "https://elyos-interview-907656039105.europe-west2.run.app/weather",
+  "endpoint_url": "https://api.example.com/v1/forecast",
   "auth_header_name": "X-API-Key",
-  "auth_env_var": "ELYOS_API_KEY",
+  "auth_env_var": "MY_API_KEY",
   "downstream_context": "an interactive streaming CLI chat assistant",
   "run_auth_edges": true,
   "run_preflight": true,

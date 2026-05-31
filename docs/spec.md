@@ -1,10 +1,10 @@
 # Spec — API-Recon Harness (Python + TypeScript)
 
 > **Provenance note.** This is the original design spec, imported verbatim from the
-> `elyosai` repo where the harness was first built. Internal path references (e.g.
-> `north_stars.md`, `AGENTS.md`, `backend/api_recon/api_recon_report.md`,
-> `smart_research/.../langgraph_examples/`) point at that original repo layout, not
-> this standalone project. In this project the implementation lives under
+> repository where the harness was first built (a sibling project). Internal path
+> references (e.g. `north_stars.md`, `AGENTS.md`, and other repo-relative paths)
+> point at that original layout, not this standalone project. In this project the
+> implementation lives under
 > `api_recon_harness/`, conventions in `north_stars.md` / `llm_rules.md`, and the
 > built artifacts may differ from the spec where the README documents a deviation
 > (e.g. the docs→config agent is a bounded completion rather than LangGraph
@@ -262,8 +262,7 @@ A run is marked `complete` only when every deterministic check passes; eval regr
 
 ---
 
-*Sources:* repo `north_stars.md`, `AGENTS.md`, `backend/api_recon/api_recon_report.md`; companion notes
-`harness_engineering_note.md`, `spec_driven_development_note.md`; skill internals per
+*Sources:* repo `north_stars.md`, `AGENTS.md`, `backend/api_recon/api_recon_report.md`; skill internals per
 `../codex/api_recon_agent_harness_report.md` (`probe_runner.py`, `probe_config.json`, `verify_report_parity.py`);
 agent-build reference `smart_research/backend/agents/agent_02_steps_meta_coder/references/langgraph_examples/`
 (current LangChain/LangGraph v1.x: `create_agent` + `ToolCallLimitMiddleware`, verified May 2026).
